@@ -1,17 +1,29 @@
 <template>
   <div id="app">
-    <renderer :frames="frames" v-bind:scale="50"/>
-    <composer 
-    :currentFrame="composingFrame" 
-    :currentFrameNumber="currentFrame"
-    @apply-color="applyColor"
-    @to-first-frame="toFirstFrame"
-    @to-last-frame="toLastFrame"
-    @to-prev-frame="toPrevFrame"
-    @to-next-frame="toNextFrame"
-    @add-frame-before="addFrameBefore"
-    @add-frame-after="addFrameAfter"
-    />
+    <div id="renderer" :style="{width: rendererBoxWidth, height: rendererBoxHeight}">
+      <renderer
+        :frames="frames"
+        :borderWidth="borderWidthMeasure"
+        :padding="paddingMeasure"
+        :rendererHeight="rendererHeight"
+        :rendererWidth="rendererWidth"
+        v-bind:scale="scale"
+        ref="renderer"
+      ></renderer>
+    </div>
+    <div id="composer">
+      <composer
+        :currentFrame="composingFrame"
+        :currentFrameNumber="currentFrame"
+        @apply-color="applyColor"
+        @to-first-frame="toFirstFrame"
+        @to-last-frame="toLastFrame"
+        @to-prev-frame="toPrevFrame"
+        @to-next-frame="toNextFrame"
+        @add-frame-before="addFrameBefore"
+        @add-frame-after="addFrameAfter"
+      />
+    </div>
   </div>
 </template>
 
@@ -21,98 +33,133 @@ function makeColor(red, green, blue) {
     red: red,
     green: green,
     blue: blue
-  }
+  };
 }
 function duplicateFrame(frame) {
   let newFrame = [];
-  for(let color in frame){
+  for (let color in frame) {
     newFrame.push(makeColor(color.red, color.green, color.blue));
   }
 }
 function makeFrame() {
   return [
-        makeColor(255,0,0),
-        makeColor(0,255,0),
-        makeColor(0,0,255),
-        makeColor(255,255,255),
-        makeColor(0,255,255),
-        makeColor(255,255,0),
-        makeColor(255,0,255),
-        makeColor(0,0,0),
-        makeColor(0,0,255),
-        makeColor(0,255,0),
-        makeColor(255,0,0),
-        makeColor(255,255,255)
-      ];
+    makeColor(255, 0, 0),
+    makeColor(0, 255, 0),
+    makeColor(0, 0, 255),
+    makeColor(255, 255, 255),
+    makeColor(0, 255, 255),
+    makeColor(255, 255, 0),
+    makeColor(255, 0, 255),
+    makeColor(0, 0, 0),
+    makeColor(0, 0, 255),
+    makeColor(0, 255, 0),
+    makeColor(255, 0, 0),
+    makeColor(255, 255, 255)
+  ];
 }
 function makeFrames(n) {
   let frames = [];
-  for(let i = 0; i < n; i++)
-    frames.push(makeFrame());
+  for (let i = 0; i < n; i++) frames.push(makeFrame());
   return frames;
 }
-import Composer from './components/Composer.vue'
-import Renderer from './components/Renderer.vue'
+import Composer from "./components/Composer.vue";
+import Renderer from "./components/Renderer.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     Composer,
     Renderer
   },
   data() {
     return {
+      scale: 20,
+      borderWidth: 2,
+      padding: 5,
       currentFrame: 0,
       frames: makeFrames(100)
-    }
+    };
   },
   computed: {
     composingFrame() {
-      console.log("composed frame updated")
       return this.frames[this.currentFrame];
+    },
+    rendererWidth() {
+      return 12 * this.scale + "px";
+    },
+    rendererHeight() {
+      return this.frames.length * this.scale + "px";
+    },
+    rendererBoxWidth() {
+      return 12 * this.scale + (this.borderWidth + this.padding) * 2 + "px";
+    },
+    rendererBoxHeight() {
+      return (
+        this.frames.length * this.scale + (this.borderWidth + this.padding) * 2 + "px"
+      );
+    },
+    borderWidthMeasure() {
+      return this.borderWidth + "px";
+    },
+    paddingMeasure() {
+      return this.padding + "px"
     }
   },
   methods: {
-            toFirstFrame() {
-                this.currentFrame=0;
-            },
-            toLastFrame() {
-                this.currentFrame=this.frames.length-1;
-            },
-            toPrevFrame() {
-              if(this.currentFrame>0)
-              this.currentFrame=this.currentFrame-1;
-            },
-            toNextFrame() {
-              if(this.currentFrame<this.frames.length-1)
-                this.currentFrame=this.currentFrame+1;
-            },
-            addFrameBefore() {
-                this.frames.splice(this.currentFrame, 0, duplicateFrame(this.frames[this.currentFrame]));
-            },
-            addFrameAfter() {
-                this.frames.splice(this.currentFrame+1, 0, duplicateFrame(this.frames[this.currentFrame]));
-                this.currentFrame = this.currentFrame + 1;
-            },
-    applyColor(color, spot){
-      console.log("Appling color "+ color + " to spot " + spot);
-      console.log(this.frames[this.currentFrame][spot])
+    toFirstFrame() {
+      this.currentFrame = 0;
+    },
+    toLastFrame() {
+      this.currentFrame = this.frames.length - 1;
+    },
+    toPrevFrame() {
+      if (this.currentFrame > 0) this.currentFrame = this.currentFrame - 1;
+    },
+    toNextFrame() {
+      if (this.currentFrame < this.frames.length - 1)
+        this.currentFrame = this.currentFrame + 1;
+    },
+    addFrameBefore() {
+      this.frames.splice(
+        this.currentFrame,
+        0,
+        duplicateFrame(this.frames[this.currentFrame])
+      );
+    },
+    addFrameAfter() {
+      this.frames.splice(
+        this.currentFrame + 1,
+        0,
+        duplicateFrame(this.frames[this.currentFrame])
+      );
+      this.currentFrame = this.currentFrame + 1;
+    },
+    applyColor(color, spot) {
       this.frames[this.currentFrame][spot].red = color.red;
       this.frames[this.currentFrame][spot].green = color.green;
       this.frames[this.currentFrame][spot].blue = color.blue;
-      console.log(this.frame[spot])
+      this.$refs.renderer.render();
     }
   }
-}
+};
 </script>
 
 <style>
+html,
+body {
+  height: 100%;
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  display: flex;
+}
+#composer {
+  align-items: stretch;
+}
+#renderer {
+  vertical-align: top;
+  align-items: stretch;
 }
 </style>
