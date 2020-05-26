@@ -21,5 +21,4 @@ jobs:
       - name: Run deploy script
         run: |
           git config user.name "mirrorshot"
-#            git config user.name "account" && git config user.email "email"
           npm run gh-pages-deploy
