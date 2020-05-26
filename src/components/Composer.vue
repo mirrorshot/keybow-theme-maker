@@ -5,7 +5,7 @@
       <button @click="firstFrame">{{firstFrameSymbol}}</button>
       <button @click="prevFrame">{{prevFrameSymbol}}</button>
       <button @click="addFrameBefore">{{addFrameBeforeSymbol}}</button>
-      <label class="frameLabel">{{currentFrameNumber + 1}}</label>
+      <button @click="removeFrame" class="delete">{{currentFrameNumber + 1}}</button>
       <button @click="addFrameAfter">{{addFrameAfterSymbol}}</button>
       <button @click="nextFrame">{{nextFrameSymbol}}</button>
       <button @click="lastFrame">{{lastFrameSymbol}}</button>
@@ -68,6 +68,9 @@ export default {
     addFrameAfter() {
       this.$emit("add-frame-after");
     },
+    removeFrame() {
+      this.$emit("delete-frame");
+    },
     usingColor(color) {
       this.currentColor = {
         red: color.rgba.r,
@@ -104,5 +107,8 @@ export default {
 }
 .frameControls {
   padding: 2mm;
+}
+.delete {
+  color: red;
 }
 </style>

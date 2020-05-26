@@ -1,6 +1,19 @@
 <template>
   <div id="app">
     <div id="renderer" :style="{width: rendererBoxWidth, height: rendererBoxHeight}">
+      <div>
+        <label for="renderScale">Scale:</label>
+        <input 
+        :value="scale"
+        @change="updateScale" 
+        type="number"
+        step="1"
+        id="renderScale" 
+        ref="renderScale" 
+        min="1"
+        max="500"
+        size="3" />
+      </div>
       <renderer
         :frames="frames"
         :borderWidth="borderWidthMeasure"
@@ -13,7 +26,7 @@
     </div>
     <div id="composer">
       <composer
-        :currentFrame="composingFrame"
+        :currentFrame="frames[currentFrame]"
         :currentFrameNumber="currentFrame"
         @apply-color="applyColor"
         @to-first-frame="toFirstFrame"
@@ -22,6 +35,7 @@
         @to-next-frame="toNextFrame"
         @add-frame-before="addFrameBefore"
         @add-frame-after="addFrameAfter"
+        @delete-frame="deleteFrame"
       />
     </div>
   </div>
@@ -40,6 +54,7 @@ function duplicateFrame(frame) {
   for (let color in frame) {
     newFrame.push(makeColor(color.red, color.green, color.blue));
   }
+  return newFrame;
 }
 function makeFrame() {
   return [
@@ -73,11 +88,12 @@ export default {
   },
   data() {
     return {
-      scale: 20,
+      scale: 2,
+      minRendererWidth: 100,
       borderWidth: 2,
       padding: 5,
       currentFrame: 0,
-      frames: makeFrames(100)
+      frames: makeFrames(10)
     };
   },
   computed: {
@@ -91,21 +107,27 @@ export default {
       return this.frames.length * this.scale + "px";
     },
     rendererBoxWidth() {
-      return 12 * this.scale + (this.borderWidth + this.padding) * 2 + "px";
+      let width = Math.max(12 * this.scale + (this.borderWidth + this.padding) * 2, this.minRendererWidth);
+      return width + "px";
     },
     rendererBoxHeight() {
       return (
-        this.frames.length * this.scale + (this.borderWidth + this.padding) * 2 + "px"
+        this.frames.length * this.scale +
+        (this.borderWidth + this.padding) * 2 +
+        "px"
       );
     },
     borderWidthMeasure() {
       return this.borderWidth + "px";
     },
     paddingMeasure() {
-      return this.padding + "px"
+      return this.padding + "px";
     }
   },
   methods: {
+    updateScale() {
+      this.scale = parseInt(this.$refs.renderScale.value);
+    },
     toFirstFrame() {
       this.currentFrame = 0;
     },
@@ -134,6 +156,16 @@ export default {
       );
       this.currentFrame = this.currentFrame + 1;
     },
+    deleteFrame() {
+      if (this.frames.length > 1) {
+        console.log("deleting frame " + this.currentFrame + " of " + this.frames.length);
+        this.frames.splice(this.currentFrame, 1);
+        if(this.currentFrame === this.frames.length)
+          this.currentFrame = this.currentFrame - 1;
+        console.log("moved to frame " + this.currentFrame + " of " + this.frames.length);
+        this.$refs.renderer.render();
+      }
+    },
     applyColor(color, spot) {
       this.frames[this.currentFrame][spot].red = color.red;
       this.frames[this.currentFrame][spot].green = color.green;
@@ -157,6 +189,7 @@ body {
 }
 #composer {
   align-items: stretch;
+  margin-left: 5mm;
 }
 #renderer {
   vertical-align: top;

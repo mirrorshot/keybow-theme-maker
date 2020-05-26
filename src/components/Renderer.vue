@@ -38,6 +38,7 @@ export default {
   },
   methods: {
     render() {
+      console.log("rendering at scale: " + this.scale);
       let context = this.$refs.renderedCanvas.getContext("2d");
       let imageWidth = 12 * this.scale;
       let imageHeight = this.frames.length * this.scale;
@@ -46,10 +47,13 @@ export default {
         imageWidth,
         imageHeight
       );
+      let lastPoint=-4;
       const rowLen = 12 * this.scale * 4;
+      console.log("scaled row length: " + rowLen);
+      console.log("scaled line height: " + rowLen * this.scale);
       for (let rowNum = 0; rowNum < this.frames.length; rowNum++) {
+        let rowBlock = rowLen * rowNum * this.scale;
         for (let i = 0; i < this.scale; i++) {
-          let rowBlock = rowLen * rowNum * this.scale;
           for (let colorNum = 0; colorNum < 12; colorNum++) {
             let red = this.frames[rowNum][colorNum].red;
             let green = this.frames[rowNum][colorNum].green;
@@ -57,6 +61,9 @@ export default {
             let colorBlock = this.scale * colorNum * 4;
             for (let j = 0; j < this.scale; j++) {
               let point = rowBlock + rowLen * i + (colorBlock + j * 4);
+              if(point !== (lastPoint+4))
+                console.log("Discontinue from " + lastPoint + " to " + point)
+              lastPoint = point;
               imageData.data[point] = red;
               imageData.data[point + 1] = green;
               imageData.data[point + 2] = blue;
@@ -65,6 +72,8 @@ export default {
           }
         }
       }
+      /*if((lastPoint + 4) !== imageData.data.length)*/
+      console.log("Last colored pixel: " + lastPoint + " data size: " + imageData.data.length);
       context.putImageData(imageData, 0, 0);
       context.save();
     }
