@@ -21,4 +21,4 @@ jobs:
       - name: Run deploy script
         run: |
           git config user.name "mirrorshot"
-          npm run pages-deploy
+          npm run deploy-pages
