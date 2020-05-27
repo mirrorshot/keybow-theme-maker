@@ -1,33 +1,41 @@
 <template>
-    <div class="animated">
-        <keybow :frame="frames[current]"></keybow>
-    </div>
+  <div class="animated">
+    <keybow :frame="frames[currentFrame]"></keybow>
+  </div>
 </template>
 
 <script>
-import Keybow from './Keybow.vue'
+import Keybow from "./Keybow.vue";
 
 export default {
-    name: "Animated",
-    props: {
-        frames: {
-            type: Array,
-            required: true
-        }
+  name: "Animated",
+  components: {
+    Keybow
+  },
+  props: {
+    frames: {
+      type: Array,
+      required: true
     },
-    data() {
-        return {
-            currentFrame: 0
-        }
-    },
-    mounted: {},
-    computed: {
-        current() {
-            this.currentFrame++;
-            if(this.currentFrame === this.frames.length)
-                this.currentFrame=0;
-            return this.currentFrame;
-        }
+    speed: {
+      type: Number,
+      required: false,
+      default: 100
     }
-}
+  },
+  data() {
+    return {
+      currentFrame: 0
+    };
+  },
+  mounted() {
+    console.log("Start animation interval with speed: " + this.speed);
+    this.intervalid1 = setInterval(() => {
+      this.currentFrame++;
+      if (this.currentFrame == this.frames.length) this.currentFrame = 0;
+      console.log("Showing frame: " + this.currentFrame);
+    }, this.speed);
+  },
+  computed: {}
+};
 </script>

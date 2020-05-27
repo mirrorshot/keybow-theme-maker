@@ -1,18 +1,19 @@
 <template>
   <div id="app">
-    <div id="renderer" :style="{width: rendererBoxWidth, height: rendererBoxHeight}">
+    <div id="left-module" :style="{width: rendererBoxWidth, height: rendererBoxHeight}">
       <div>
         <label for="renderScale">Scale:</label>
-        <input 
-        :value="scale"
-        @change="updateScale" 
-        type="number"
-        step="1"
-        id="renderScale" 
-        ref="renderScale" 
-        min="1"
-        max="500"
-        size="3" />
+        <input
+          :value="scale"
+          @change="updateScale"
+          type="number"
+          step="1"
+          id="renderScale"
+          ref="renderScale"
+          min="1"
+          max="500"
+          size="3"
+        />
       </div>
       <renderer
         :frames="frames"
@@ -24,19 +25,26 @@
         ref="renderer"
       ></renderer>
     </div>
-    <div id="composer">
-      <composer
-        :currentFrame="frames[currentFrame]"
-        :currentFrameNumber="currentFrame"
-        @apply-color="applyColor"
-        @to-first-frame="toFirstFrame"
-        @to-last-frame="toLastFrame"
-        @to-prev-frame="toPrevFrame"
-        @to-next-frame="toNextFrame"
-        @add-frame-before="addFrameBefore"
-        @add-frame-after="addFrameAfter"
-        @delete-frame="deleteFrame"
-      />
+    <div id="right-module">
+      <div id="animated">
+        <animated
+        :frames="frames"
+        ></animated>
+      </div>
+      <div id="composer">
+        <composer
+          :currentFrame="frames[currentFrame]"
+          :currentFrameNumber="currentFrame"
+          @apply-color="applyColor"
+          @to-first-frame="toFirstFrame"
+          @to-last-frame="toLastFrame"
+          @to-prev-frame="toPrevFrame"
+          @to-next-frame="toNextFrame"
+          @add-frame-before="addFrameBefore"
+          @add-frame-after="addFrameAfter"
+          @delete-frame="deleteFrame"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -79,12 +87,14 @@ function makeFrames(n) {
 }
 import Composer from "./components/Composer.vue";
 import Renderer from "./components/Renderer.vue";
+import Animated from "./components/Animated.vue";
 
 export default {
   name: "App",
   components: {
     Composer,
-    Renderer
+    Renderer,
+    Animated
   },
   data() {
     return {
@@ -107,7 +117,10 @@ export default {
       return this.frames.length * this.scale + "px";
     },
     rendererBoxWidth() {
-      let width = Math.max(12 * this.scale + (this.borderWidth + this.padding) * 2, this.minRendererWidth);
+      let width = Math.max(
+        12 * this.scale + (this.borderWidth + this.padding) * 2,
+        this.minRendererWidth
+      );
       return width + "px";
     },
     rendererBoxHeight() {
@@ -158,11 +171,15 @@ export default {
     },
     deleteFrame() {
       if (this.frames.length > 1) {
-        console.log("deleting frame " + this.currentFrame + " of " + this.frames.length);
+        console.log(
+          "deleting frame " + this.currentFrame + " of " + this.frames.length
+        );
         this.frames.splice(this.currentFrame, 1);
-        if(this.currentFrame === this.frames.length)
+        if (this.currentFrame === this.frames.length)
           this.currentFrame = this.currentFrame - 1;
-        console.log("moved to frame " + this.currentFrame + " of " + this.frames.length);
+        console.log(
+          "moved to frame " + this.currentFrame + " of " + this.frames.length
+        );
         this.$refs.renderer.render();
       }
     },
@@ -187,7 +204,7 @@ body {
   color: #2c3e50;
   display: flex;
 }
-#composer {
+#right-module {
   align-items: stretch;
   margin-left: 5mm;
 }
