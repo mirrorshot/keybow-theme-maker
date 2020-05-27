@@ -33,7 +33,6 @@ export default {
     this.intervalid1 = setInterval(() => {
       this.currentFrame++;
       if (this.currentFrame == this.frames.length) this.currentFrame = 0;
-      console.log("Showing frame: " + this.currentFrame);
     }, this.speed);
   },
   computed: {}
