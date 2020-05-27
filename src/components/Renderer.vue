@@ -38,31 +38,35 @@ export default {
   },
   methods: {
     render() {
-      console.log("rendering at scale: " + this.scale);
+      //console.log("rendering at scale: " + this.scale);
       let context = this.$refs.renderedCanvas.getContext("2d");
       let imageWidth = 12 * this.scale;
       let imageHeight = this.frames.length * this.scale;
-      console.log("ImageData: " + imageWidth + "x" + imageHeight);
+      //console.log("ImageData: " + imageWidth + "x" + imageHeight);
       let imageData = context.createImageData(
         imageWidth,
         imageHeight
       );
       let lastPoint=-4;
       const rowLen = 12 * this.scale * 4;
-      console.log("scaled row length: " + rowLen);
-      console.log("scaled line height: " + rowLen * this.scale);
+      //console.log("scaled row length: " + rowLen);
+      //console.log("scaled line height: " + rowLen * this.scale);
       for (let rowNum = 0; rowNum < this.frames.length; rowNum++) {
         let rowBlock = rowLen * rowNum * this.scale;
+        //console.log("row:\n  num: " + rowNum + "\n  block_start: " + rowBlock);
         for (let i = 0; i < this.scale; i++) {
+          let rowStart = rowBlock + (rowLen * i);
+          //console.log("  color_row:\n    num: " + i + "\n    start: " + rowStart);
           for (let colorNum = 0; colorNum < 12; colorNum++) {
             let red = this.frames[rowNum][colorNum].red;
             let green = this.frames[rowNum][colorNum].green;
             let blue = this.frames[rowNum][colorNum].blue;
             let colorBlock = this.scale * colorNum * 4;
+            //console.log("    color: \n      num: " + colorNum + "\n      block_start: " + colorBlock);
             for (let j = 0; j < this.scale; j++) {
-              let point = rowBlock + rowLen * i + (colorBlock + j * 4);
-              if(point !== (lastPoint+4))
-                console.log("Discontinue from " + lastPoint + " to " + point)
+              let point = rowStart + colorBlock + (j * 4);
+              //if(point !== (lastPoint+4))
+                //console.log("Discontinue from " + lastPoint + " to " + point)
               lastPoint = point;
               imageData.data[point] = red;
               imageData.data[point + 1] = green;
