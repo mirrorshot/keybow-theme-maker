@@ -88,7 +88,7 @@ export default {
   },
   data() {
     return {
-      scale: 2,
+      scale: 15,
       minRendererWidth: 100,
       borderWidth: 2,
       padding: 5,
