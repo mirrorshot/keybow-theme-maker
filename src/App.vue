@@ -26,6 +26,12 @@
       ></renderer>
     </div>
     <div id="right-module">
+      <SaveAndLoad 
+      :palette="composerPalette"
+      :frames="frames"
+      @loading-frames="loadFrames"
+      @loading-palette="loadPalette"
+      />
       <div id="animated">
         <animated
         :frames="frames"
@@ -85,13 +91,15 @@ function makeFrames(n) {
 import Composer from "./components/Composer.vue";
 import Renderer from "./components/Renderer.vue";
 import Animated from "./components/Animated.vue";
+import SaveAndLoad from "./components/SaveAndLoad.vue";
 
 export default {
   name: "App",
   components: {
     Composer,
     Renderer,
-    Animated
+    Animated,
+    SaveAndLoad
   },
   data() {
     return {
@@ -100,7 +108,8 @@ export default {
       borderWidth: 2,
       padding: 5,
       currentFrame: 0,
-      frames: makeFrames(20)
+      frames: makeFrames(20),
+      composerPalette: []
     };
   },
   computed: {
@@ -135,6 +144,18 @@ export default {
     }
   },
   methods: {
+    loadFrames(frames) {
+      console.log("loaded new frames", frames);
+      console.log("frames were", this.frames);
+      this.frames.splice(0, this.frames.length);
+      for(let frame in frames) {
+        this.frames.push(frame);
+      }
+      console.log("frames are", this.frames);
+    },
+    loadPalette(palette){
+      this.composerPalette.splice(0, this.composerPalette.length, palette);
+    },
     updateScale() {
       this.scale = parseInt(this.$refs.renderScale.value);
     },
