@@ -11,7 +11,7 @@ function renderWhite(canvas, imageWidth, imageHeight){
   let imageData = context.createImageData(imageWidth, imageHeight);
   for(let i=0; i<imageData.data.length; i++)
     imageData.data[i]=255;
-  context.putImageData(imageData);
+  context.putImageData(imageData, 0, 0);
   context.save();
 }
 

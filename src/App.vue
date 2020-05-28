@@ -26,17 +26,14 @@
       ></renderer>
     </div>
     <div id="right-module">
-      <SaveAndLoad 
-      :palette="composerPalette"
-      :frames="frames"
-      @loading-frames="loadFrames"
-      @loading-palette="loadPalette"
+      <SaveAndLoad
+        :palette="composerPalette"
+        :frames="frames"
+        @loading-frames="loadFrames"
+        @loading-palette="loadPalette"
       />
       <div id="animated">
-        <animated
-        ref="animated"
-        :frames="frames"
-        ></animated>
+        <animated ref="animated" :frames="frames"></animated>
       </div>
       <div id="composer">
         <composer
@@ -80,8 +77,7 @@ function duplicateFrame(frame) {
 }
 function makeRandomFrame() {
   let frames = [];
-  for(let i=0; i<12; i++)
-    frames.push(makeRandColor());
+  for (let i = 0; i < 12; i++) frames.push(makeRandColor());
   return frames;
 }
 function makeFrames(n) {
@@ -154,7 +150,7 @@ export default {
       console.log("frames are", this.frames);
       this.$refs.animated.restartAnimation();
     },
-    loadPalette(palette){
+    loadPalette(palette) {
       this.composerPalette.splice(0, this.composerPalette.length, palette);
     },
     updateScale() {
@@ -189,12 +185,14 @@ export default {
       this.currentFrame = this.currentFrame + 1;
     },
     deleteFrame() {
+      this.$refs.animated.stopAnimationAt0();
       if (this.frames.length > 1) {
         this.frames.splice(this.currentFrame, 1);
         if (this.currentFrame === this.frames.length)
           this.currentFrame = this.currentFrame - 1;
         this.$refs.renderer.render();
       }
+      this.$refs.animated.restartAnimation();
     },
     applyColor(color, spot) {
       this.frames[this.currentFrame][spot].red = color.red;
