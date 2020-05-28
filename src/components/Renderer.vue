@@ -5,6 +5,16 @@
 </template>
 
 <script>
+function renderWhite(canvas, imageWidth, imageHeight){
+  //console.log("canvas to white");
+  let context = canvas.getContext("2d");
+  let imageData = context.createImageData(imageWidth, imageHeight);
+  for(let i=0; i<imageData.data.length; i++)
+    imageData.data[i]=255;
+  context.putImageData(imageData);
+  context.save();
+}
+
 export default {
   name: "renderer",
   props: {
@@ -33,15 +43,25 @@ export default {
         required: true
     }
   },
+  data() {
+    return {
+      lastFrameCount: this.frames.length
+    }
+  },
   mounted() {
     this.render();
   },
   methods: {
     render() {
-      //console.log("rendering at scale: " + this.scale);
-      let context = this.$refs.renderedCanvas.getContext("2d");
+      let canvas = this.$refs.renderedCanvas;
+      let context = canvas.getContext("2d");
       let imageWidth = 12 * this.scale;
       let imageHeight = this.frames.length * this.scale;
+      if(this.frames.length !== this.lastFrameCount){
+        this.lastFrameCount = this.frames.length;
+        renderWhite(canvas, imageWidth, imageHeight);
+      }
+      //console.log("rendering at scale: " + this.scale);
       //console.log("ImageData: " + imageWidth + "x" + imageHeight);
       let imageData = context.createImageData(
         imageWidth,
