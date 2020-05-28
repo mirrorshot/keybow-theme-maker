@@ -34,6 +34,7 @@
       />
       <div id="animated">
         <animated
+        ref="animated"
         :frames="frames"
         ></animated>
       </div>
@@ -144,14 +145,14 @@ export default {
     }
   },
   methods: {
-    loadFrames(frames) {
-      console.log("loaded new frames", frames);
+    loadFrames(newFrames) {
+      this.$refs.animated.stopAnimationAt0();
+      this.currentFrame = 0;
+      console.log("loaded new frames", newFrames);
       console.log("frames were", this.frames);
-      this.frames.splice(0, this.frames.length);
-      for(let frame in frames) {
-        this.frames.push(frame);
-      }
+      this.frames.splice(0, this.frames.length, newFrames);
       console.log("frames are", this.frames);
+      this.$refs.animated.restartAnimation();
     },
     loadPalette(palette){
       this.composerPalette.splice(0, this.composerPalette.length, palette);
@@ -189,11 +190,9 @@ export default {
     },
     deleteFrame() {
       if (this.frames.length > 1) {
-        //console.log("deleting frame " + this.currentFrame + " of " + this.frames.length);
         this.frames.splice(this.currentFrame, 1);
         if (this.currentFrame === this.frames.length)
           this.currentFrame = this.currentFrame - 1;
-        //console.log("moved to frame " + this.currentFrame + " of " + this.frames.length);
         this.$refs.renderer.render();
       }
     },

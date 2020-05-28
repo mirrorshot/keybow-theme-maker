@@ -46,7 +46,7 @@ export default {
     methods: {
         loadJson() {
             let reader = new FileReader();
-            reader.onload = function(event) {
+            reader.onload = (event) => {
                 let loaded = JSON.parse(event.target.result);
                 console.log("parsed input", loaded);
                 this.$emit("loading-frames", loaded);
