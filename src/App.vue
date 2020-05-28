@@ -57,6 +57,13 @@ function makeColor(red, green, blue) {
     blue: blue
   };
 }
+function makeRandColor() {
+  return {
+    red: Math.floor(Math.random() * 256),
+    green: Math.floor(Math.random() * 256),
+    blue: Math.floor(Math.random() * 256)
+  };
+}
 function duplicateFrame(frame) {
   let newFrame = [];
   for (let color in frame) {
@@ -64,25 +71,15 @@ function duplicateFrame(frame) {
   }
   return newFrame;
 }
-function makeFrame() {
-  return [
-    makeColor(255, 0, 0),
-    makeColor(0, 255, 0),
-    makeColor(0, 0, 255),
-    makeColor(255, 255, 255),
-    makeColor(0, 255, 255),
-    makeColor(255, 255, 0),
-    makeColor(255, 0, 255),
-    makeColor(0, 0, 0),
-    makeColor(0, 0, 255),
-    makeColor(0, 255, 0),
-    makeColor(255, 0, 0),
-    makeColor(255, 255, 255)
-  ];
+function makeRandomFrame() {
+  let frames = [];
+  for(let i=0; i<12; i++)
+    frames.push(makeRandColor());
+  return frames;
 }
 function makeFrames(n) {
   let frames = [];
-  for (let i = 0; i < n; i++) frames.push(makeFrame());
+  for (let i = 0; i < n; i++) frames.push(makeRandomFrame());
   return frames;
 }
 import Composer from "./components/Composer.vue";
@@ -103,7 +100,7 @@ export default {
       borderWidth: 2,
       padding: 5,
       currentFrame: 0,
-      frames: makeFrames(10)
+      frames: makeFrames(20)
     };
   },
   computed: {
@@ -171,15 +168,11 @@ export default {
     },
     deleteFrame() {
       if (this.frames.length > 1) {
-        console.log(
-          "deleting frame " + this.currentFrame + " of " + this.frames.length
-        );
+        //console.log("deleting frame " + this.currentFrame + " of " + this.frames.length);
         this.frames.splice(this.currentFrame, 1);
         if (this.currentFrame === this.frames.length)
           this.currentFrame = this.currentFrame - 1;
-        console.log(
-          "moved to frame " + this.currentFrame + " of " + this.frames.length
-        );
+        //console.log("moved to frame " + this.currentFrame + " of " + this.frames.length);
         this.$refs.renderer.render();
       }
     },
