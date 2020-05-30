@@ -17,10 +17,8 @@
       </div>
       <renderer
         :frames="frames"
-        :borderWidth="borderWidthMeasure"
-        :padding="paddingMeasure"
-        :rendererHeight="rendererHeight"
-        :rendererWidth="rendererWidth"
+        v-bind:borderWidth="rendererBorderWidth"
+        v-bind:padding="rendererPadding"
         v-bind:scale="scale"
         ref="renderer"
       ></renderer>
@@ -102,8 +100,8 @@ export default {
     return {
       scale: 15,
       minRendererWidth: 100,
-      borderWidth: 2,
-      padding: 5,
+      rendererBorderWidth: 2,
+      rendererPadding: 5,
       currentFrame: 0,
       frames: makeFrames(20),
       composerPalette: []
@@ -112,12 +110,6 @@ export default {
   computed: {
     composingFrame() {
       return this.frames[this.currentFrame];
-    },
-    rendererWidth() {
-      return 12 * this.scale + "px";
-    },
-    rendererHeight() {
-      return this.frames.length * this.scale + "px";
     },
     rendererBoxWidth() {
       let width = Math.max(
@@ -132,12 +124,6 @@ export default {
         (this.borderWidth + this.padding) * 2 +
         "px"
       );
-    },
-    borderWidthMeasure() {
-      return this.borderWidth + "px";
-    },
-    paddingMeasure() {
-      return this.padding + "px";
     }
   },
   methods: {
@@ -155,6 +141,7 @@ export default {
     },
     updateScale() {
       this.scale = parseInt(this.$refs.renderScale.value);
+      this.$refs.renderer.render();
     },
     toFirstFrame() {
       this.currentFrame = 0;

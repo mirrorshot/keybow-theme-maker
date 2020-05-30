@@ -1,0 +1,136 @@
+<html>
+
+<body>
+    <div>
+        <canvas id="myCanvas">
+
+        </canvas>
+    </div>
+    <div id="color-frames">
+
+    </div>
+    <script>
+        let color_frames = [
+            [
+                {
+                    red: 255,
+                    green: 0,
+                    blue: 0
+                },
+                {
+                    red: 0,
+                    green: 255,
+                    blue: 0
+                },
+                {
+                    red: 0,
+                    green: 0,
+                    blue: 255
+                }
+            ],
+            [
+                {
+                    red: 0,
+                    green: 0,
+                    blue: 0
+                },
+                {
+                    red: 255,
+                    green: 0,
+                    blue: 0
+                },
+                {
+                    red: 0,
+                    green: 255,
+                    blue: 0
+                }
+            ],
+            [
+                {
+                    red: 0,
+                    green: 0,
+                    blue: 255
+                },
+                {
+                    red: 0,
+                    green: 0,
+                    blue: 0
+                },
+                {
+                    red: 255,
+                    green: 0,
+                    blue: 0
+                }
+            ],
+            [
+                {
+                    red: 0,
+                    green: 255,
+                    blue: 0
+                },
+                {
+                    red: 0,
+                    green: 0,
+                    blue: 255
+                },
+                {
+                    red: 0,
+                    green: 0,
+                    blue: 0
+                }
+            ]
+        ]
+        document.getElementById("color-frames").textContent = color_frames; 
+        let scale = 20;
+        let color_line_length = color_frames[0].length;
+        let canvas = document.getElementById("myCanvas");
+        let context = canvas.getContext("2d");
+        let imageWidth = color_line_length * scale;
+        let imageHeight = color_frames.length * scale;
+        canvas.style.height = imageHeight;
+        canvas.style.width = imageWidth;
+//        let imageData = context.createImageData(
+//            imageWidth,
+//            imageHeight
+//        );
+//        let lastPoint = -4;
+        const rowLen = color_line_length * scale * 4;
+//        for (let rowNum = 0; rowNum < color_frames.length; rowNum++) {
+//            let rowBlock = rowLen * rowNum * scale;
+//            for (let i = 0; i < scale; i++) {
+//                let rowStart = rowBlock + (rowLen * i);
+//                for (let colorNum = 0; colorNum < color_line_length; colorNum++) {
+//                    let red = color_frames[rowNum][colorNum].red;
+//                    let green = color_frames[rowNum][colorNum].green;
+//                    let blue = color_frames[rowNum][colorNum].blue;
+//                    let colorBlock = scale * colorNum * 4;
+//                    for (let j = 0; j < scale; j++) {
+//                        let point = rowStart + colorBlock + (j * 4);
+//                        lastPoint = point;
+//                        imageData.data[point] = red;
+//                        imageData.data[point + 1] = green;
+//                        imageData.data[point + 2] = blue;
+//                        imageData.data[point + 3] = 255;
+//                    }
+//                }
+//            }
+//        }
+        for(let row = 0; row < color_frames.length; row++) {
+            const y0 = row * scale;
+            for(let color = 0; color < color_line_length; color++) {
+                const x0 = color * scale;
+                const fillColor = "#" + (color_frames[row][color].red).toString(16).padStart(2, '0')
+                 + (color_frames[row][color].green).toString(16).padStart(2, '0')
+                 + (color_frames[row][color].blue).toString(16).padStart(2, '0');
+                console.log("rectangle", x0, y0, fillColor);
+                context.fillStyle = fillColor;
+                context.fillRect(x0, y0, scale, scale);
+            }
+        }
+//        console.log("Last colored pixel: " + lastPoint + " data size: " + imageData.data.length);
+//        context.putImageData(imageData, 0, 0);
+        context.save();
+    </script>
+</body>
+
+</html>
