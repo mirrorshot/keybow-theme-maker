@@ -11,10 +11,6 @@
 export default {
   name: "renderer",
   props: {
-    frames: {
-      type: Array,
-      required: true
-    },
     borderWidth: {
       type: Number,
       required: true
@@ -26,32 +22,32 @@ export default {
   },
   data() {
     return {
+      frames: [],
       scale: 10
     };
   },
-  mounted() {
-    this.render(this.scale);
-  },
+//  mounted() {
+//    this.render(this.scale, this.frames);
+//  },
   methods: {
-    render(scale) {
-      console.log("rendering at scale: " + scale);
+    render(scale, frames) {
       this.scale = scale;
+      this.frames = frames;
       let canvas = this.$refs.renderedCanvas;
       let context = canvas.getContext("2d");
       canvas.height = 0;
       canvas.width = 0;
       canvas.height = this.computeRendererHeight();
       canvas.width = this.computeRendererWidth();
-      console.log("at scale " + scale + " canvas size: " + canvas.width + "x" + canvas.height);
-      for (let row = 0; row < this.frames.length; row++) {
+      for (let row = 0; row < frames.length; row++) {
         const y0 = row * scale;
         for (let color = 0; color < 12; color++) {
           const x0 = color * scale;
           const fillColor =
             "#" +
-            this.frames[row][color].red.toString(16).padStart(2, "0") +
-            this.frames[row][color].green.toString(16).padStart(2, "0") +
-            this.frames[row][color].blue.toString(16).padStart(2, "0");
+            frames[row][color].red.toString(16).padStart(2, "0") +
+            frames[row][color].green.toString(16).padStart(2, "0") +
+            frames[row][color].blue.toString(16).padStart(2, "0");
           context.fillStyle = fillColor;
           context.fillRect(x0, y0, scale, scale);
         }
@@ -72,7 +68,6 @@ export default {
       );
       width = this.computeRendererWidth();
       width = width  + "px";
-      console.log("at scale " + this.scale + " renderer box width: " + width);
       return width;
     },
     rendererHeight() {
@@ -82,7 +77,6 @@ export default {
       );
       height = this.computeRendererHeight();
       height = height  + "px";
-      console.log("at scale " + this.scale + " renderer box height: " + height);
       return height;
     },
     borderWidthMeasure() {

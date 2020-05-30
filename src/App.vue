@@ -133,10 +133,10 @@ export default {
     loadFrames(newFrames) {
       this.$refs.animated.stopAnimationAt0();
       this.currentFrame = 0;
-      console.log("loaded new frames", newFrames);
-      console.log("frames were", this.frames);
-      this.frames.splice(0, this.frames.length, newFrames);
-      console.log("frames are", this.frames);
+      const oldSize = this.frames.length;
+      this.frames = this.frames.concat(newFrames);
+      this.frames.splice(0, oldSize);
+      this.render();
       this.$refs.animated.restartAnimation();
     },
     loadPalette(palette) {
@@ -144,7 +144,6 @@ export default {
     },
     updateScale(event) {
       this.scale = parseInt(event.target.value);
-      console.log("new scale is: " + this.scale);
       this.render();
     },
     toFirstFrame() {
@@ -193,7 +192,7 @@ export default {
       this.render();
     },
     render() {
-      this.$refs.renderer.render(this.scale);
+      this.$refs.renderer.render(this.scale, this.frames);
     }
   }
 };
