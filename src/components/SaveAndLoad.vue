@@ -59,7 +59,7 @@ export default {
     },
     scale: {
       type: Number,
-      required: true
+      default: 1
     }
   },
   methods: {

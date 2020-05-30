@@ -1,22 +1,29 @@
 <template>
   <div class="animated">
     <keybow :frame="frames[currentFrame]"></keybow>
+    <div>
     <button 
     @click="stopAnimation"
     :disabled="!animationRunning"
-    >Stop</button>
+    >Pause</button>
     <button 
     @click="continueAnimation"
     :disabled="animationRunning"
     >Continue</button>
     <button 
     @click="restartAnimation"
+    >Restart</button>
+    </div>
+    <div>
+    <button 
+    @click="animateBack"
     :disabled="animationRunning"
-    >Start</button>
+    >Previous</button>
     <button 
     @click="animate"
     :disabled="animationRunning"
     >Next</button>
+    </div>
   </div>
 </template>
 
@@ -58,6 +65,11 @@ export default {
       if (this.currentFrame >= this.frames.length)
         this.currentFrame = 0;
     },
+    animateBack: function() {
+      this.currentFrame--;
+      if (this.currentFrame <= 0)
+        this.currentFrame = this.frames.length - 1;
+    },
     stopAnimation() {
       clearInterval(this.animationInterval);
       this.animationInterval = null;
@@ -94,3 +106,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.animated {
+  width: 60mm;
+}
+</style>
