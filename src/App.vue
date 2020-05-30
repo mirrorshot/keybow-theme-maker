@@ -68,8 +68,8 @@ function makeRandColor() {
 }
 function duplicateFrame(frame) {
   let newFrame = [];
-  for (let color in frame) {
-    newFrame.push(makeColor(color.red, color.green, color.blue));
+  for (let color = 0; color<frame.length; color++) {
+    newFrame.push(makeColor(frame[color].red, frame[color].green, frame[color].blue));
   }
   return newFrame;
 }
@@ -126,6 +126,9 @@ export default {
       );
     }
   },
+  mounted() {
+      this.render();
+  },
   methods: {
     loadFrames(newFrames) {
       this.$refs.animated.stopAnimationAt0();
@@ -139,9 +142,10 @@ export default {
     loadPalette(palette) {
       this.composerPalette.splice(0, this.composerPalette.length, palette);
     },
-    updateScale() {
-      this.scale = parseInt(this.$refs.renderScale.value);
-      this.$refs.renderer.render();
+    updateScale(event) {
+      this.scale = parseInt(event.target.value);
+      console.log("new scale is: " + this.scale);
+      this.render();
     },
     toFirstFrame() {
       this.currentFrame = 0;
@@ -170,6 +174,7 @@ export default {
         duplicateFrame(this.frames[this.currentFrame])
       );
       this.currentFrame = this.currentFrame + 1;
+      this.render();
     },
     deleteFrame() {
       this.$refs.animated.stopAnimationAt0();
@@ -177,7 +182,7 @@ export default {
         this.frames.splice(this.currentFrame, 1);
         if (this.currentFrame === this.frames.length)
           this.currentFrame = this.currentFrame - 1;
-        this.$refs.renderer.render();
+        this.render();
       }
       this.$refs.animated.restartAnimation();
     },
@@ -185,7 +190,10 @@ export default {
       this.frames[this.currentFrame][spot].red = color.red;
       this.frames[this.currentFrame][spot].green = color.green;
       this.frames[this.currentFrame][spot].blue = color.blue;
-      this.$refs.renderer.render();
+      this.render();
+    },
+    render() {
+      this.$refs.renderer.render(this.scale);
     }
   }
 };
