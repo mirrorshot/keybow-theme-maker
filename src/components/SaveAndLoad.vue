@@ -19,12 +19,32 @@
       <button @click="saveJson">Save</button>
       <button @click="download">Download</button>
     </div>
+    <div class="hidden">
+      <theme-canvas ref="theme"></theme-canvas>
+    </div>
   </div>
 </template>
 
 <script>
+function saveFile(filename, blob) {
+  if (window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveBlob(blob, filename);
+  } else {
+    var elem = window.document.createElement("a");
+    elem.href = window.URL.createObjectURL(blob);
+    elem.download = filename;
+    document.body.appendChild(elem);
+    elem.click();
+    document.body.removeChild(elem);
+  }
+}
+import ThemeCanvas from "./ThemeCanvas.vue";
+
 export default {
   name: "SaveAndLoad",
+  components: {
+    ThemeCanvas
+  },
   props: {
     palette: {
       type: Array,
@@ -35,6 +55,10 @@ export default {
     },
     frames: {
       type: Array,
+      required: true
+    },
+    scale: {
+      type: Number,
       required: true
     }
   },
@@ -58,18 +82,24 @@ export default {
       const data = JSON.stringify(this.frames);
       const filename = "keybow-theme.json";
       var blob = new Blob([data], { type: "application/json" });
-      if (window.navigator.msSaveOrOpenBlob) {
-        window.navigator.msSaveBlob(blob, filename);
-      } else {
-        var elem = window.document.createElement("a");
-        elem.href = window.URL.createObjectURL(blob);
-        elem.download = filename;
-        document.body.appendChild(elem);
-        elem.click();
-        document.body.removeChild(elem);
-      }
+      saveFile(filename, blob);
     },
-    download() {}
+    download() {
+      this.$refs.theme.render(this.scale, this.frames);
+      const imageType = "image/png";
+      this.$refs.theme.saveImage((blob)=>{
+          saveFile("theme.png", blob)
+      }, imageType);
+      //const filename = "theme.png";
+      //const blob = new Blob([data], { type: imageType });
+      //saveFile(filename, blob);
+    }
   }
 };
 </script>
+
+<style scoped>
+.hidden {
+  display: none;
+}
+</style>

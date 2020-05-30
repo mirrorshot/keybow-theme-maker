@@ -27,6 +27,7 @@
       <SaveAndLoad
         :palette="composerPalette"
         :frames="frames"
+        v-bind:scale="saveScale"
         @loading-frames="loadFrames"
         @loading-palette="loadPalette"
       />
@@ -99,6 +100,7 @@ export default {
   data() {
     return {
       scale: 15,
+      saveScale: 1,
       minRendererWidth: 100,
       rendererBorderWidth: 2,
       rendererPadding: 5,
