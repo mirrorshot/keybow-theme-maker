@@ -187,7 +187,9 @@ export default {
       this.$refs.animated.restartAnimation();
     },
     loadPalette(palette) {
-      this.composerPalette.splice(0, this.composerPalette.length, palette);
+      const oldSize = this.composerPalette.length;
+      this.composerPalette = this.composerPalette.concat(palette);
+      this.composerPalette.splice(0, oldSize);
     },
     updateScale(event) {
       this.scale = parseInt(event.target.value);
