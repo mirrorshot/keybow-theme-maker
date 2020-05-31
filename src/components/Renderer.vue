@@ -3,8 +3,7 @@
     class="renderer"
     :style="{width: rendererWidth, height: rendererHeight, borderWidth: borderWidthMeasure, padding: paddingMeasure}"
   >
-    <theme-canvas ref="renderedCanvas"
-    ></theme-canvas>
+    <theme-canvas ref="renderedCanvas"></theme-canvas>
   </div>
 </template>
 
@@ -32,9 +31,9 @@ export default {
       scale: 10
     };
   },
-//  mounted() {
-//    this.render(this.scale, this.frames);
-//  },
+  //  mounted() {
+  //    this.render(this.scale, this.frames);
+  //  },
   methods: {
     render(scale, frames) {
       this.scale = scale;
@@ -50,21 +49,17 @@ export default {
   },
   computed: {
     rendererWidth() {
-      let width = (
-        this.computeRendererWidth() +
-        2 * (this.padding + this.borderWidth)
-      );
+      let width =
+        this.computeRendererWidth() + 2 * (this.padding + this.borderWidth);
       width = this.computeRendererWidth();
-      width = width  + "px";
+      width = width + "px";
       return width;
     },
     rendererHeight() {
-      let height = (
-        this.computeRendererHeight() +
-        2 * (this.padding + this.borderWidth)
-      );
+      let height =
+        this.computeRendererHeight() + 2 * (this.padding + this.borderWidth);
       height = this.computeRendererHeight();
-      height = height  + "px";
+      height = height + "px";
       return height;
     },
     borderWidthMeasure() {

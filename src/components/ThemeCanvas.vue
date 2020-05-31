@@ -13,7 +13,7 @@ export default {
     };
   },
   mounted() {
-      this.canvas = this.$refs.theme;
+    this.canvas = this.$refs.theme;
   },
   methods: {
     render(scale, frames) {
@@ -46,7 +46,7 @@ export default {
       return this.frames.length * this.scale;
     },
     extractData(imageType) {
-        return this.canvas.toDataURL(imageType);
+      return this.canvas.toDataURL(imageType);
     },
     saveImage(callback, imageType) {
       this.canvas.toBlob(callback, imageType);

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div id="left-module" :style="{width: rendererBoxWidth, height: rendererBoxHeight}">
+    <div class="module" :style="{width: rendererBoxWidth, height: rendererBoxHeight}">
       <div>
         <label for="renderScale">Scale:</label>
         <input
@@ -23,14 +23,7 @@
         ref="renderer"
       ></renderer>
     </div>
-    <div id="right-module">
-      <SaveAndLoad
-        :palette="composerPalette"
-        :frames="frames"
-        v-bind:scale="saveScale"
-        @loading-frames="loadFrames"
-        @loading-palette="loadPalette"
-      />
+    <div class="module">
       <div id="animated">
         <animated ref="animated" :frames="frames"></animated>
       </div>
@@ -38,6 +31,7 @@
         <composer
           :currentFrame="frames[currentFrame]"
           :currentFrameNumber="currentFrame"
+          :colorPalette="composerPalette"
           @apply-color="applyColor"
           @to-first-frame="toFirstFrame"
           @to-last-frame="toLastFrame"
@@ -48,6 +42,21 @@
           @delete-frame="deleteFrame"
         />
       </div>
+    </div>
+    <div class="module">
+      <SaveAndLoad
+        :palette="composerPalette"
+        :frames="frames"
+        v-bind:scale="saveScale"
+        @loading-frames="loadFrames"
+        @loading-palette="loadPalette"
+      />
+      <div>
+        <label for="paletteSize">Max colors in palette:</label>
+        <input id="paletteSize" ref="paletteSize" v-bind:value="paletteMaxSize" />
+        <button @click="setPaletteSize">Set</button>
+      </div>
+      <Presets :defaults="composedDefaults" @load-frames="loadFrames"></Presets>
     </div>
   </div>
 </template>
@@ -69,17 +78,45 @@ function makeRandColor() {
 }
 function duplicateFrame(frame) {
   let newFrame = [];
-  for (let color = 0; color<frame.length; color++) {
-    newFrame.push(makeColor(frame[color].red, frame[color].green, frame[color].blue));
+  for (let color = 0; color < frame.length; color++) {
+    newFrame.push(
+      makeColor(frame[color].red, frame[color].green, frame[color].blue)
+    );
   }
   return newFrame;
 }
 function makeRandomFrame() {
-  let frames = [];
-  for (let i = 0; i < 12; i++) frames.push(makeRandColor());
-  return frames;
+  let frame = [];
+  for (let i = 0; i < 12; i++) frame.push(makeRandColor());
+  return frame;
 }
-function makeFrames(n) {
+function makeWhiteFrame() {
+  let frame = [];
+  for (let i = 0; i < 12; i++) frame.push(makeColor(255, 255, 255));
+  return frame;
+}
+function makeBlackFrame() {
+  let frame = [];
+  for (let i = 0; i < 12; i++) frame.push(makeColor(0, 0, 0));
+  return frame;
+}
+/*function makeRainbowFrame() {
+  let frame = [];
+  frame.push(makeColor());
+  frame.push(makeColor());
+  frame.push(makeColor());
+  frame.push(makeColor());
+  frame.push(makeColor());
+  frame.push(makeColor());
+  frame.push(makeColor());
+  frame.push(makeColor());
+  frame.push(makeColor());
+  frame.push(makeColor());
+  frame.push(makeColor());
+  frame.push(makeColor());
+  return frame;
+}*/
+function makeRandomFrames(n) {
   let frames = [];
   for (let i = 0; i < n; i++) frames.push(makeRandomFrame());
   return frames;
@@ -88,6 +125,7 @@ import Composer from "./components/Composer.vue";
 import Renderer from "./components/Renderer.vue";
 import Animated from "./components/Animated.vue";
 import SaveAndLoad from "./components/SaveAndLoad.vue";
+import Presets from "./components/Presets.vue";
 
 export default {
   name: "App",
@@ -95,7 +133,8 @@ export default {
     Composer,
     Renderer,
     Animated,
-    SaveAndLoad
+    SaveAndLoad,
+    Presets
   },
   data() {
     return {
@@ -105,8 +144,14 @@ export default {
       rendererBorderWidth: 2,
       rendererPadding: 5,
       currentFrame: 0,
-      frames: makeFrames(20),
-      composerPalette: []
+      frames: makeRandomFrames(20),
+      paletteMaxSize: 20,
+      composerPalette: [],
+      composedDefaults: [
+        /*{ label: "Rainbow", frames: [makeRainbowFrame()] },*/
+        { label: "White", frames: [makeWhiteFrame()] },
+        { label: "Black", frames: [makeBlackFrame()] }
+      ]
     };
   },
   computed: {
@@ -129,7 +174,7 @@ export default {
     }
   },
   mounted() {
-      this.render();
+    this.render();
   },
   methods: {
     loadFrames(newFrames) {
@@ -188,6 +233,21 @@ export default {
       this.$refs.animated.restartAnimation();
     },
     applyColor(color, spot) {
+      const colorIndex = this.composerPalette.findIndex(c => {
+        return (
+          c.red === color.red &&
+          c.green === color.green &&
+          c.blue === color.blue
+        );
+      });
+      if (colorIndex === -1) {
+        this.composerPalette.unshift(color);
+        if (this.composerPalette.length > this.paletteMaxSize)
+          this.composerPalette.pop();
+      } else if (colorIndex !== 0) {
+        this.composerPalette.splice(colorIndex, 1);
+        this.composerPalette.unshift(color);
+      }
       this.frames[this.currentFrame][spot].red = color.red;
       this.frames[this.currentFrame][spot].green = color.green;
       this.frames[this.currentFrame][spot].blue = color.blue;
@@ -195,6 +255,9 @@ export default {
     },
     render() {
       this.$refs.renderer.render(this.scale, this.frames);
+    },
+    setPaletteSize() {
+      this.paletteMaxSize = this.$refs.paletteSize.value;
     }
   }
 };
@@ -211,9 +274,10 @@ body {
   color: #2c3e50;
   display: flex;
 }
-#right-module {
+.module {
   align-items: stretch;
   margin-left: 5mm;
+  vertical-align: top;
 }
 #renderer {
   vertical-align: top;

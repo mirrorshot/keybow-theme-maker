@@ -10,7 +10,12 @@
       <button @click="nextFrame">{{nextFrameSymbol}}</button>
       <button @click="lastFrame">{{lastFrameSymbol}}</button>
     </div>
-    <color-picker theme="light" :color="color" @changeColor="usingColor" />
+    <color-picker
+      theme="light"
+      :color="color"
+      :colors-default="colorPaletteFormatted"
+      @changeColor="usingColor"
+    />
   </div>
 </template>
 
@@ -31,6 +36,10 @@ export default {
     },
     currentFrameNumber: {
       type: Number,
+      required: true
+    },
+    colorPalette: {
+      type: Array,
       required: true
     }
   },
@@ -93,6 +102,14 @@ export default {
         this.currentColor.blue +
         ")"
       );
+    },
+    colorPaletteFormatted() {
+      const colors = this.colorPalette.map(color => {
+        return (
+          "rgba(" + color.red + ", " + color.green + ", " + color.blue + ", 1)"
+        );
+      });
+      return colors;
     }
   }
 };

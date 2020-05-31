@@ -16,6 +16,7 @@
       <button @click="loadPalette">Load</button>
     </div>
     <div>
+      <button @click="savePaletteJson">Save Palette</button>
       <button @click="saveJson">Save</button>
       <button @click="download">Download</button>
     </div>
@@ -67,7 +68,6 @@ export default {
       let reader = new FileReader();
       reader.onload = event => {
         let loaded = JSON.parse(event.target.result);
-        console.log("parsed input", loaded);
         this.$emit("loading-frames", loaded);
       };
       reader.readAsText(this.$refs.loadingFramesFile.files[0]);
@@ -76,7 +76,18 @@ export default {
       console.log("Loading PNG");
     },
     loadPalette() {
-      console.log("Loading palette");
+      let reader = new FileReader();
+      reader.onload = event => {
+        let loaded = JSON.parse(event.target.result);
+        this.$emit("loading-palette", loaded);
+      };
+      reader.readAsText(this.$refs.loadingPaletteFile.files[0]);
+    },
+    savePaletteJson() {
+      const data = JSON.stringify(this.palette);
+      const filename = "keybow-palette.json";
+      var blob = new Blob([data], { type: "application/json" });
+      saveFile(filename, blob);
     },
     saveJson() {
       const data = JSON.stringify(this.frames);
@@ -87,12 +98,9 @@ export default {
     download() {
       this.$refs.theme.render(this.scale, this.frames);
       const imageType = "image/png";
-      this.$refs.theme.saveImage((blob)=>{
-          saveFile("theme.png", blob)
+      this.$refs.theme.saveImage(blob => {
+        saveFile("theme.png", blob);
       }, imageType);
-      //const filename = "theme.png";
-      //const blob = new Blob([data], { type: imageType });
-      //saveFile(filename, blob);
     }
   }
 };
