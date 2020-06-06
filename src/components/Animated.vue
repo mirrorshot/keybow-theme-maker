@@ -39,16 +39,20 @@ export default {
     frames: {
       type: Array,
       required: true
+    },
+    speed: {
+      type: Number,
+      default: 25
     }
   },
   data() {
     return {
       currentFrame: 0,
-      animationInterval: null,
-      speed: 100
+      animationInterval: null
     };
   },
   mounted() {
+    this.$refs.animationSpeed.value = this.speed;
     this.animationInterval = setInterval(() => {
       this.currentFrame++;
       if (this.currentFrame == this.frames.length) this.currentFrame = 0;
