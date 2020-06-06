@@ -1,7 +1,7 @@
 <template>
   <div class="animated">
     <div>
-      <label for="animationSpeed">Speed:</label>
+      <label for="animationSpeed">Frame time(ms):</label>
       <input
         value="100"
         @change="updateSpeed"

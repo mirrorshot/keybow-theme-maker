@@ -28,6 +28,26 @@
         <animated ref="animated" :frames="frames"></animated>
       </div>
       <div id="composer">
+        <div>
+          <Gradienter ref="gradienter" :frameSize="frameSize"></Gradienter>
+          <label for="gradientSteps">Gradient steps:</label>
+          <input
+            type="number"
+            name="gradientSteps"
+            ref="gradientSteps"
+            size="8"
+            maxlength="8"
+            value="10"
+          />
+          <div>
+            <button @click="computeGradient">compute</button>
+            <button @click="computeGradientAround">around</button>
+          </div>
+          <div>
+            <button @click="revert" :disabled="!canRevert">Revert</button>
+            <button @click="redo" :disabled="!canRedo">Redo</button>
+          </div>
+        </div>
         <composer
           :currentFrame="frames[currentFrame]"
           :currentFrameNumber="currentFrame"
@@ -40,7 +60,7 @@
           @add-frame-before="addFrameBefore"
           @add-frame-after="addFrameAfter"
           @delete-frame="deleteFrame"
-        />
+        ></composer>
       </div>
     </div>
     <div class="module">
@@ -56,11 +76,12 @@
         <input id="paletteSize" ref="paletteSize" v-bind:value="paletteMaxSize" />
         <button @click="setPaletteSize">Set</button>
       </div>
-      <Presets 
-      :defaults="composedDefaults"
-      :palette="composerPalette"
-      v-bind:frameSize="frameSize"
-      @load-frames="loadFrames"></Presets>
+      <Presets
+        :defaults="composedDefaults"
+        :palette="composerPalette"
+        v-bind:frameSize="frameSize"
+        @load-frames="loadFrames"
+      ></Presets>
     </div>
   </div>
 </template>
@@ -130,11 +151,13 @@ import Renderer from "./components/Renderer.vue";
 import Animated from "./components/Animated.vue";
 import SaveAndLoad from "./components/SaveAndLoad.vue";
 import Presets from "./components/Presets.vue";
+import Gradienter from "./components/Gradienter.vue";
 
 export default {
   name: "App",
   components: {
     Composer,
+    Gradienter,
     Renderer,
     Animated,
     SaveAndLoad,
@@ -156,7 +179,12 @@ export default {
         /*{ label: "Rainbow", frames: [makeRainbowFrame()] },*/
         { label: "White", frames: [makeWhiteFrame()] },
         { label: "Black", frames: [makeBlackFrame()] }
-      ]
+      ],
+      framesHistory: {
+        size: 10,
+        previous: [],
+        next: []
+      }
     };
   },
   computed: {
@@ -176,6 +204,12 @@ export default {
         (this.borderWidth + this.padding) * 2 +
         "px"
       );
+    },
+    canRevert() {
+      return this.framesHistory.previous.length > 0;
+    },
+    canRedo() {
+      return this.framesHistory.next.length > 0;
     }
   },
   mounted() {
@@ -183,6 +217,10 @@ export default {
   },
   methods: {
     loadFrames(newFrames) {
+      this.savePast();
+      this.loadFramesNoHistory(newFrames);
+    },
+    loadFramesNoHistory(newFrames) {
       this.$refs.animated.stopAnimationAt0();
       this.currentFrame = 0;
       const oldSize = this.frames.length;
@@ -265,6 +303,42 @@ export default {
     },
     setPaletteSize() {
       this.paletteMaxSize = this.$refs.paletteSize.value;
+    },
+    computeGradient(around = false) {
+      this.loadFrames(
+        this.$refs.gradienter.composeGradients(
+          this.frames,
+          this.$refs.gradientSteps.value,
+          around
+        )
+      );
+    },
+    computeGradientAround() {
+      this.computeGradient(true);
+    },
+    savePast() {
+      this.framesHistory.next.splice(0, this.framesHistory.next.length);
+      while (this.framesHistory.previous.length >= this.framesHistory.size)
+        this.framesHistory.previous.splice(0, 1);
+      this.framesHistory.previous.push(this.duplicateCurrent());
+    },
+    duplicateCurrent() {
+      const toStore = [];
+      for (let i = 0; i < this.frames.length; i++)
+        toStore.push(duplicateFrame(this.frames[i]));
+      return toStore;
+    },
+    revert() {
+      while (this.framesHistory.next.length >= this.framesHistory.size)
+        this.framesHistory.next.splice(0, 1);
+      this.framesHistory.next.push(this.duplicateCurrent());
+      this.loadFramesNoHistory(this.framesHistory.previous.pop());
+    },
+    redo() {
+      while (this.framesHistory.previous.length >= this.framesHistory.size)
+        this.framesHistory.previous.splice(0, 1);
+      this.framesHistory.previous.push(this.duplicateCurrent());
+      this.loadFramesNoHistory(this.framesHistory.next.pop());
     }
   }
 };
