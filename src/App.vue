@@ -56,7 +56,11 @@
         <input id="paletteSize" ref="paletteSize" v-bind:value="paletteMaxSize" />
         <button @click="setPaletteSize">Set</button>
       </div>
-      <Presets :defaults="composedDefaults" @load-frames="loadFrames"></Presets>
+      <Presets 
+      :defaults="composedDefaults"
+      :palette="composerPalette"
+      v-bind:frameSize="frameSize"
+      @load-frames="loadFrames"></Presets>
     </div>
   </div>
 </template>
@@ -138,6 +142,7 @@ export default {
   },
   data() {
     return {
+      frameSize: 12,
       scale: 15,
       saveScale: 1,
       minRendererWidth: 100,
