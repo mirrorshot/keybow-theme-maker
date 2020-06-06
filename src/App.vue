@@ -44,8 +44,10 @@
             <button @click="computeGradientAround">around</button>
           </div>
           <div>
+            <span>{{framesHistory.previous.length}} </span>
             <button @click="revert" :disabled="!canRevert">Revert</button>
             <button @click="redo" :disabled="!canRedo">Redo</button>
+            <span> {{framesHistory.next.length}}</span>
           </div>
         </div>
         <composer
@@ -181,7 +183,7 @@ export default {
         { label: "Black", frames: [makeBlackFrame()] }
       ],
       framesHistory: {
-        size: 10,
+        size: 20,
         previous: [],
         next: []
       }
@@ -252,6 +254,7 @@ export default {
         this.currentFrame = this.currentFrame + 1;
     },
     addFrameBefore() {
+      this.savePast();
       this.frames.splice(
         this.currentFrame,
         0,
@@ -259,6 +262,7 @@ export default {
       );
     },
     addFrameAfter() {
+      this.savePast();
       this.frames.splice(
         this.currentFrame + 1,
         0,
@@ -268,6 +272,7 @@ export default {
       this.render();
     },
     deleteFrame() {
+      this.savePast();
       this.$refs.animated.stopAnimationAt0();
       if (this.frames.length > 1) {
         this.frames.splice(this.currentFrame, 1);
@@ -278,6 +283,7 @@ export default {
       this.$refs.animated.restartAnimation();
     },
     applyColor(color, spot) {
+      this.savePast();
       const colorIndex = this.composerPalette.findIndex(c => {
         return (
           c.red === color.red &&
@@ -329,13 +335,13 @@ export default {
       return toStore;
     },
     revert() {
-      while (this.framesHistory.next.length >= this.framesHistory.size)
+      while (this.framesHistory.previous.length + this.framesHistory.next.length >= this.framesHistory.size)
         this.framesHistory.next.splice(0, 1);
       this.framesHistory.next.push(this.duplicateCurrent());
       this.loadFramesNoHistory(this.framesHistory.previous.pop());
     },
     redo() {
-      while (this.framesHistory.previous.length >= this.framesHistory.size)
+      while (this.framesHistory.previous.length + this.framesHistory.next.length>= this.framesHistory.size)
         this.framesHistory.previous.splice(0, 1);
       this.framesHistory.previous.push(this.duplicateCurrent());
       this.loadFramesNoHistory(this.framesHistory.next.pop());
