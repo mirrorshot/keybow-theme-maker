@@ -5,6 +5,12 @@
 <script>
 export default {
   name: "ThemeCanvas",
+  props: {
+    frameSize: {
+      type: Number,
+      default: 12
+    }
+  },
   data() {
     return {
       frames: [],
@@ -20,27 +26,31 @@ export default {
       this.scale = scale;
       this.frames = frames;
       let context = this.canvas.getContext("2d");
-      this.canvas.height = 0;
-      this.canvas.width = 0;
       this.canvas.height = this.computeRendererHeight();
       this.canvas.width = this.computeRendererWidth();
       for (let row = 0; row < frames.length; row++) {
         const y0 = row * scale;
-        for (let color = 0; color < 12; color++) {
+        for (let color = 0; color < this.frameSize; color++) {
           const x0 = color * scale;
-          const fillColor =
-            "#" +
-            frames[row][color].red.toString(16).padStart(2, "0") +
-            frames[row][color].green.toString(16).padStart(2, "0") +
-            frames[row][color].blue.toString(16).padStart(2, "0");
-          context.fillStyle = fillColor;
+          context.fillStyle = this.padColor(frames[row][color]);
           context.fillRect(x0, y0, scale, scale);
         }
       }
       context.save();
     },
+    padColor(color) {
+      return (
+        "#" +
+        this.padColorComponent(color.red) +
+        this.padColorComponent(color.green) +
+        this.padColorComponent(color.blue)
+      );
+    },
+    padColorComponent(component) {
+      return parseInt(component).toString(16).padStart(2, "0");
+    },
     computeRendererWidth() {
-      return 12 * this.scale;
+      return this.frameSize * this.scale;
     },
     computeRendererHeight() {
       return this.frames.length * this.scale;

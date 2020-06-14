@@ -44,10 +44,10 @@
             <button @click="computeGradientAround">around</button>
           </div>
           <div>
-            <span>{{framesHistory.previous.length}} </span>
+            <span class="past">{{framesHistory.previous.length}}</span>
             <button @click="revert" :disabled="!canRevert">Revert</button>
             <button @click="redo" :disabled="!canRedo">Redo</button>
-            <span> {{framesHistory.next.length}}</span>
+            <span class="future">{{framesHistory.next.length}}</span>
           </div>
         </div>
         <composer
@@ -104,13 +104,9 @@ function makeRandColor() {
   };
 }
 function duplicateFrame(frame) {
-  let newFrame = [];
-  for (let color = 0; color < frame.length; color++) {
-    newFrame.push(
-      makeColor(frame[color].red, frame[color].green, frame[color].blue)
-    );
-  }
-  return newFrame;
+  return frame.map(c => {
+    return makeColor(c.red, c.green, c.blue);
+  });
 }
 function makeRandomFrame() {
   let frame = [];
@@ -225,9 +221,7 @@ export default {
     loadFramesNoHistory(newFrames) {
       this.$refs.animated.stopAnimationAt0();
       this.currentFrame = 0;
-      const oldSize = this.frames.length;
-      this.frames = this.frames.concat(newFrames);
-      this.frames.splice(0, oldSize);
+      this.frames.splice(0, this.frames.length, ...newFrames);
       this.render();
       this.$refs.animated.restartAnimation();
     },
@@ -253,23 +247,18 @@ export default {
       if (this.currentFrame < this.frames.length - 1)
         this.currentFrame = this.currentFrame + 1;
     },
-    addFrameBefore() {
+    addFramesInPosition(position, frames) {
+      if(frames === undefined)
+        frames = [this.frames[this.currentFrame]];
       this.savePast();
-      this.frames.splice(
-        this.currentFrame,
-        0,
-        duplicateFrame(this.frames[this.currentFrame])
-      );
+      this.frames.splice(position, 0, ...frames);
+      this.render();
+    },
+    addFrameBefore() {
+      this.addFramesInPosition(this.currentFrame);
     },
     addFrameAfter() {
-      this.savePast();
-      this.frames.splice(
-        this.currentFrame + 1,
-        0,
-        duplicateFrame(this.frames[this.currentFrame])
-      );
-      this.currentFrame = this.currentFrame + 1;
-      this.render();
+      this.addFramesInPosition(this.currentFrame + 1);
     },
     deleteFrame() {
       this.savePast();
@@ -284,6 +273,13 @@ export default {
     },
     applyColor(color, spot) {
       this.savePast();
+      this.updatePalette(color);
+      this.frames[this.currentFrame][spot].red = color.red;
+      this.frames[this.currentFrame][spot].green = color.green;
+      this.frames[this.currentFrame][spot].blue = color.blue;
+      this.render();
+    },
+    updatePalette(color) {
       const colorIndex = this.composerPalette.findIndex(c => {
         return (
           c.red === color.red &&
@@ -296,13 +292,8 @@ export default {
         if (this.composerPalette.length > this.paletteMaxSize)
           this.composerPalette.pop();
       } else if (colorIndex !== 0) {
-        this.composerPalette.splice(colorIndex, 1);
-        this.composerPalette.unshift(color);
+        this.composerPalette.unshift(this.composerPalette.pop(colorIndex));
       }
-      this.frames[this.currentFrame][spot].red = color.red;
-      this.frames[this.currentFrame][spot].green = color.green;
-      this.frames[this.currentFrame][spot].blue = color.blue;
-      this.render();
     },
     render() {
       this.$refs.renderer.render(this.scale, this.frames);
@@ -325,24 +316,24 @@ export default {
     savePast() {
       this.framesHistory.next.splice(0, this.framesHistory.next.length);
       while (this.framesHistory.previous.length >= this.framesHistory.size)
-        this.framesHistory.previous.splice(0, 1);
+        this.framesHistory.previous.pop(0);
       this.framesHistory.previous.push(this.duplicateCurrent());
     },
     duplicateCurrent() {
-      const toStore = [];
-      for (let i = 0; i < this.frames.length; i++)
-        toStore.push(duplicateFrame(this.frames[i]));
-      return toStore;
+      return this.frames.map(duplicateFrame);
     },
     revert() {
-      while (this.framesHistory.previous.length + this.framesHistory.next.length >= this.framesHistory.size)
-        this.framesHistory.next.splice(0, 1);
+      while (
+        this.framesHistory.previous.length + this.framesHistory.next.length >=
+        this.framesHistory.size
+      )
+        if (this.framesHistory.next.length === 0)
+          this.framesHistory.previous.pop(0);
+        else this.framesHistory.next.pop(0);
       this.framesHistory.next.push(this.duplicateCurrent());
       this.loadFramesNoHistory(this.framesHistory.previous.pop());
     },
     redo() {
-      while (this.framesHistory.previous.length + this.framesHistory.next.length>= this.framesHistory.size)
-        this.framesHistory.previous.splice(0, 1);
       this.framesHistory.previous.push(this.duplicateCurrent());
       this.loadFramesNoHistory(this.framesHistory.next.pop());
     }
@@ -369,5 +360,11 @@ body {
 #renderer {
   vertical-align: top;
   align-items: stretch;
+}
+.past {
+  padding-right: 2mm;
+}
+.future {
+  padding-left: 2mm;
 }
 </style>

@@ -94,13 +94,13 @@ export default {
   computed: {
     color() {
       return (
-        "rgb(" +
+        "rgba(" +
         this.currentColor.red +
         "," +
         this.currentColor.green +
         "," +
         this.currentColor.blue +
-        ")"
+        ", 1)"
       );
     },
     colorPaletteFormatted() {

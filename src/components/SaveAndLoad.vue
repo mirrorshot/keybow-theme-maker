@@ -73,7 +73,7 @@ export default {
       reader.readAsText(this.$refs.loadingFramesFile.files[0]);
     },
     loadPng() {
-      console.log("Loading PNG");
+      console.error("PNG loading not implemented!");
     },
     loadPalette() {
       let reader = new FileReader();

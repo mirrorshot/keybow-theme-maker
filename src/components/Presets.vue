@@ -3,12 +3,7 @@
     <div>
       <span class="title">Random</span>
       <label for="number">Frames:</label>
-      <input 
-      type="number" 
-      name="randomFramesNumber"
-      ref="randomFramesNumber" 
-      size="8"
-      value="25"/>
+      <input type="number" name="randomFramesNumber" ref="randomFramesNumber" size="8" value="25" />
       <button @click="generateRandom">Random</button>
       <button @click="generateRandomInPalette">In Palette</button>
     </div>
@@ -51,16 +46,26 @@ export default {
       for (let i = 0; i < count; i++) frames.push(this.generateRandomFrame());
       this.$emit("load-frames", frames);
     },
-    generateRandomFrame() {
+    generateRandomFrame(palette) {
       let frame = [];
-      for (let i = 0; i < this.frameSize; i++) frame.push(this.makeRandColor());
+      for (let i = 0; i < this.frameSize; i++)
+        frame.push(this.makeRandomColor(palette));
       return frame;
     },
-    makeRandColor() {
+    makeRandomColor(palette) {
+      if (palette === undefined)
+        return {
+          red: Math.floor(Math.random() * 256),
+          green: Math.floor(Math.random() * 256),
+          blue: Math.floor(Math.random() * 256)
+        };
+      const color = this.palette[
+        Math.floor(Math.random() * this.palette.length)
+      ];
       return {
-        red: Math.floor(Math.random() * 256),
-        green: Math.floor(Math.random() * 256),
-        blue: Math.floor(Math.random() * 256)
+        red: color.red,
+        green: color.green,
+        blue: color.blue
       };
     },
     generateRandomInPalette() {
@@ -68,24 +73,8 @@ export default {
       const frames = [];
       const count = this.$refs.randomFramesNumber.value;
       for (let i = 0; i < count; i++)
-        frames.push(this.generateRandomFrameInPalette());
+        frames.push(this.generateRandomFrame(this.palette));
       this.$emit("load-frames", frames);
-    },
-    generateRandomFrameInPalette() {
-      const frame = [];
-      for (let i = 0; i < this.frameSize; i++){
-        frame.push(
-          this.makeColor(this.palette[Math.floor(Math.random() * this.palette.length)])
-        );
-      }
-      return frame;
-    },
-    makeColor(color) {
-      return {
-        red: color.red,
-        green: color.green,
-        blue: color.blue
-      };
     }
   },
   computed: {

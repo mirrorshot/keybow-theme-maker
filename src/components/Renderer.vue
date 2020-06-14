@@ -31,9 +31,6 @@ export default {
       scale: 10
     };
   },
-  //  mounted() {
-  //    this.render(this.scale, this.frames);
-  //  },
   methods: {
     render(scale, frames) {
       this.scale = scale;
