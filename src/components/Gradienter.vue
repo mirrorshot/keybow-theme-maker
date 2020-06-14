@@ -14,40 +14,36 @@ export default {
   methods: {
     composeGradients(frames, steps = 1, around = false) {
       let extended = [];
+      const gradientSteps = parseInt(steps) + 2;
       for (let i = 0; i < frames.length - 1; i++) {
-        const currentFrame = frames[i];
-        const nextFrame = frames[i + 1];
-        const interpolatedFrames = this.interpolateFrames(
-          currentFrame,
-          nextFrame,
-          parseInt(steps) + 2
+        extended.splice(extended.length, 0,
+          ...this.interpolateFrames(frames[i], frames[i + 1], gradientSteps)
         );
-        for (let step = 0; step < interpolatedFrames.length; step++)
-          extended.push(interpolatedFrames[step]);
       }
-      if(around) {
-        const currentFrame = frames[frames.length-1];
-        const nextFrame = frames[0];
-        const interpolatedFrames = this.interpolateFrames(
-          currentFrame,
-          nextFrame,
-          parseInt(steps) + 2
+      if (around === true) {
+        extended.splice(extended.length, 0,
+          ...this.interpolateFrames(
+            frames[frames.length - 1],
+            frames[0],
+            gradientSteps
+          )
         );
-        for (let step = 0; step < interpolatedFrames.length-1; step++)
-          extended.push(interpolatedFrames[step]);
+      } else {
+        extended.push(frames[frames.length - 1]);
       }
       return extended;
     },
     interpolateFrames(frame1, frame2, steps) {
       const interpolated = [];
-      for (let i = 0; i < steps; i++) interpolated.push([]);
+      for (let i = 0; i < steps - 1; i++) interpolated.push([]);
       for (let color = 0; color < this.frameSize; color++) {
         const gradient = this.interpolateColors(
           frame1[color],
           frame2[color],
           steps
         );
-        for (let i = 0; i < steps; i++) interpolated[i][color] = gradient[i];
+        for (let i = 0; i < steps - 1; i++)
+          interpolated[i][color] = gradient[i];
       }
       return interpolated;
     },
