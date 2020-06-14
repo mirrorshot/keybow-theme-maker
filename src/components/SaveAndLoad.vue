@@ -1,24 +1,38 @@
 <template>
   <div class="controls">
     <div>
-      <label for="loadingFramesFile">JSON:</label>
-      <input type="file" id="loadingFramesFile" ref="loadingFramesFile" />
-      <button @click="loadJson">Load</button>
+      <input
+        class="buttoned"
+        type="file"
+        accept="application/json"
+        id="loadingFramesFile"
+        ref="loadingFramesFile"
+        @change="loadingFramesJson"
+      />
+      <button @click="loadJson">Load JSON</button>
+      <input
+        class="buttoned"
+        type="file"
+        accept="image/png"
+        id="loadingFramesImage"
+        ref="loadingFramesImage"
+        @change="loadingFramesPNG"
+      />
+      <button @click="loadPNG" disabled>Load PNG</button>
+      <input
+        class="buttoned"
+        type="file"
+        accept="application/json"
+        id="loadingPaletteFile"
+        ref="loadingPaletteFile"
+        @change="loadingPaletteJson"
+      />
+      <button @click="loadPalette">Load Palette</button>
     </div>
     <div>
-      <label for="loadingFramesImage">PNG:</label>
-      <input type="file" id="loadingFramesImage" ref="loadingFramesImage" />
-      <button @click="loadPng">Load</button>
-    </div>
-    <div>
-      <label for="loadingPaletteFile">Palette:</label>
-      <input type="file" id="loadingPaletteFile" ref="loadingPaletteFile" />
-      <button @click="loadPalette">Load</button>
-    </div>
-    <div>
-      <button @click="savePaletteJson">Save Palette</button>
-      <button @click="saveJson">Save</button>
+      <button @click="saveJson">Save JSON</button>
       <button @click="download">Download</button>
+      <button @click="savePaletteJson">Save Palette</button>
     </div>
     <div class="hidden">
       <theme-canvas ref="theme"></theme-canvas>
@@ -64,24 +78,30 @@ export default {
     }
   },
   methods: {
-    loadJson() {
+    loadingFramesJson(event) {
       let reader = new FileReader();
       reader.onload = event => {
         let loaded = JSON.parse(event.target.result);
         this.$emit("loading-frames", loaded);
       };
-      reader.readAsText(this.$refs.loadingFramesFile.files[0]);
+      reader.readAsText(event.target.files[0]);
+    },
+    loadJson() {
+      this.$refs.loadingFramesFile.click();
     },
     loadPng() {
       console.error("PNG loading not implemented!");
     },
-    loadPalette() {
+    loadingPaletteJson(event) {
       let reader = new FileReader();
       reader.onload = event => {
         let loaded = JSON.parse(event.target.result);
         this.$emit("loading-palette", loaded);
       };
-      reader.readAsText(this.$refs.loadingPaletteFile.files[0]);
+      reader.readAsText(event.target.files[0]);
+    },
+    loadPalette() {
+      this.$refs.loadingPaletteFile.click();
     },
     savePaletteJson() {
       const data = JSON.stringify(this.palette);
@@ -108,6 +128,9 @@ export default {
 
 <style scoped>
 .hidden {
+  display: none;
+}
+input.buttoned {
   display: none;
 }
 </style>
