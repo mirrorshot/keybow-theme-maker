@@ -4,6 +4,9 @@
 
 Thanks to GitHub pages, try it [here](https://mirrorshot.github.io/keybow-theme-maker/).
 
+## Dependencies
+This application runs with Node.js 14.x and requires Python 2 to be installed.
+
 ## Project setup
 ```
 npm install
