@@ -5,6 +5,7 @@ const fs = require("fs");
     try {
         await execa("git", ["checkout", "--orphan", "gh-pages"]);
         console.log("Building...");
+        await execa("npm", ["install"]);
         await execa("npm", ["run", "build"]);
         // Understand if it's dist or build folder
         const folderName = fs.existsSync("dist") ? "dist" : "build";
